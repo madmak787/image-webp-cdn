@@ -5,6 +5,12 @@ $extentions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'tif', 'webp', 'svg',
 $sites = ['khanamir.me'];
 
 $new = "RewriteEngine on\n";
+
+$new .= "\n### Disallow db file access ###";
+$new .= "\n";
+$new .= "RewriteCond %{THE_REQUEST} \.pdf[?\s] [NC]";
+$new .= "\n";
+
 $new .= "\n### Redirect image requests to php file ###";
 $new .= "\n";
 

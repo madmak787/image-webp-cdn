@@ -1,11 +1,4 @@
 <?php
-// ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL);
-const DIR = '/cdn/';
-
-define( 'PATH', rtrim($_SERVER['DOCUMENT_ROOT'], '/') . DIR );
-$actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]" . DIR;
-define( 'URL', $actual_link );
-
 function getAddresses($domain)
 {
     $records = dns_get_record($domain);
