@@ -63,6 +63,12 @@
             <button type="submit">Upload</button>
         </form>
         <div id="status"></div>
+        <h1>Upload Your Video</h1>
+        <form id="uploadForm" action="http://localhost/cdn/" method="post" enctype="multipart/form-data">
+            <label for="file">Select Image:</label>
+            <input type="file" id="file" name="file" accept="video/mp4,video/x-m4v,video/*">
+            <button type="submit">Upload</button>
+        </form>
     </div>
 </body>
 </html>

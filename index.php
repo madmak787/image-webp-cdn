@@ -8,18 +8,36 @@ require 'htaccess.php';
 if(isset($_FILES['file']) && $_FILES['file']['error']==0) {
     $imagePath = $_FILES['file']['tmp_name'];
     $outputDir = './uploads';
-    $webpPath = convertToWebP($imagePath, $outputDir);
+
+    $mimeType = mime_content_type($imagePath);
+    if ($mimeType === false) {
+        throw new Exception("Unable to determine MIME type");
+    }
+
+    if (strpos($mimeType, 'image/') !== false) {
+        $webpPath = convertToWebP($imagePath, $outputDir);
+    } elseif (strpos($mimeType, 'video/') !== false) {
+        try {
+            $webpPath = convertToVideo($_FILES['file'], $outputDir);
+            customlog('Optimized video uploaded successfully: ' . $webpPath);
+        } catch (Exception $e) {
+            customlog('Error processing video: ' . $e->getMessage());
+        }
+    } else {
+        throw new Exception("Unsupported file type");
+    }
 
     $data = [
 		'name'=>$_FILES['file']['name'],
 		'url'=>$webpPath,
 		'created_at'=>time(),
 		'last_accessed'=>time(),
-		'domain'=>$_SERVER['HTTP_HOST'],
+		'domain'=> empty($_SERVER['HTTP_REFERER'])?'':parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST),
 	];
 	insert('images',$data);
 
-    echo $webpPath;
+    echo json_encode(['url'=>$webpPath]);
+    exit;
 } else {
     $accessed = empty($_GET['access'])?true:false;
     $filename = str_replace('php','webp',$_SERVER['SCRIPT_FILENAME']);

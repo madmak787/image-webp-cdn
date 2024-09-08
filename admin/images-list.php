@@ -1,5 +1,11 @@
 <title>Images List</title>
-<?php include 'inc/header.php';?>
+<?php
+include 'inc/header.php';
+
+if(isset($_GET['delete'])) {
+	delete('images', $_GET['delete']);
+}
+?>
 
 <main id="main" class="main">
 
