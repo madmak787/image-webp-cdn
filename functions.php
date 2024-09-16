@@ -47,90 +47,54 @@ function customlog($message, $logFile = 'custom.log') {
     }
 }
 
-// Example usage:
-// customlog('This is a test log message');
-// customlog(['key' => 'value', 'another_key' => 'another_value']);
-// customlog(123); // Will be converted to string
-
-
 function convertToWebP($imagePath, $outputDir)
 {
-    if($imagePath) {
-        // Check if GD library is installed
-        if (!extension_loaded('gd')) {
-            customlog('GD library is not installed');
-            throw new Exception('GD library is not installed');
-        }
-
-        // Get current timestamp
-        $timestamp = time();
-
-        // Extract year, month, and day from timestamp
-        $year = date('Y', $timestamp);
-        $month = date('m', $timestamp);
-        $day = date('d', $timestamp);
-
-        // Create full path for the day folder
-        $dayFolder = $outputDir . '/' . $year . '/' . $month . '/' . $day;
-
-        // Create day folder if it doesn't exist
-        if (!is_dir($dayFolder)) {
-            customlog($dayFolder);
-            mkdir($dayFolder, 0755, true);
-        }
-
-        // Generate unique filename based on timestamp
-        $randomName = substr(str_shuffle(str_repeat(date('YmdHis', $timestamp).'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil(20 / 62))), 0, 20);
-        $filename = $randomName . '.webp';
-
-        // Full path for the WebP file
-        $webpPath = $dayFolder . '/' . $filename;
-
-        customlog($webpPath);
-
-        // Convert image to WebP
-        $quality = 90;
-        $sourceImage = imagecreatefromstring(file_get_contents($imagePath));
-        
-        if ($sourceImage === false) {
-            customlog('Failed to open source image');
-            throw new Exception('Failed to open source image');
-        }
-
-        // Add resizing logic here
-        list($width, $height) = getimagesize($imagePath);
-        
-        // Define maximum dimensions
-        $maxWidth = 1920; // Adjust as needed
-        $maxHeight = 1080; // Adjust as needed
-
-        if ($width > $maxWidth || $height > $maxHeight) {
-            $ratio = min($maxWidth / $width, $maxHeight / $height);
-            $newWidth = round($width * $ratio);
-            $newHeight = round($height * $ratio);
-
-            $thumb = imagecreatetruecolor($newWidth, $newHeight);
-            imagecopyresampled($thumb, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-            
-            // Convert optimized image to WebP
-            $webpImage = imagewebp($thumb, $webpPath, $quality);
-        } else {
-            // Convert original image to WebP
-            $webpImage = imagewebp($sourceImage, $webpPath, $quality);
-        }
-
-        if ($webpImage === false) {
-            customlog('Failed to create WebP image');
-            throw new Exception('Failed to create WebP image');
-        }
-
-        imagedestroy($sourceImage);
-        // imagedestroy($webpImage);
-
-        return str_replace( '/./', '/', URL . $webpPath );
-    } else {
-        return false;
+    if (!$imagePath || !$outputDir) {
+        throw new Exception('Invalid image path or output directory.');
     }
+
+    // Check if GD library is installed
+    if (!extension_loaded('gd')) {
+        customlog('GD library is not installed');
+        throw new Exception('GD library is not installed');
+    }
+
+    // Get current timestamp
+    $timestamp = time();
+
+    // Extract year, month, and day from timestamp
+    $year = date('Y', $timestamp);
+    $month = date('m', $timestamp);
+    $day = date('d', $timestamp);
+
+    // Create full path for the day folder
+    $dayFolder = $outputDir . '/' . $year . '/' . $month . '/' . $day;
+
+    // Create day folder if it doesn't exist
+    if (!is_dir($dayFolder)) {
+        customlog('Creating directory: ' . $dayFolder);
+        if (!mkdir($dayFolder, 0755, true)) {
+            customlog('Failed to create directory: ' . $dayFolder);
+            throw new Exception('Failed to create directory: ' . $dayFolder);
+        }
+    }
+
+    // Generate unique filename based on timestamp
+    $randomName = substr(str_shuffle(str_repeat(date('YmdHis', $timestamp).'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil(20 / 62))), 0, 20);
+    $fileExtension = pathinfo($imagePath, PATHINFO_EXTENSION);
+    $filename = $randomName . '.' . $fileExtension;
+
+    // Full path for the uploaded file
+    $filePath = $dayFolder . '/' . $filename;
+
+    // Move uploaded file to the new location
+    if (!move_uploaded_file($imagePath, $filePath)) {
+        customlog('Failed to move uploaded file. Path: ' . $filePath);
+        throw new Exception('Failed to move uploaded file.');
+    }
+
+    // Return the URL of the uploaded file
+    return str_replace('/./', '/', URL . $filePath);
 }
 
 function convertToVideo($files, $outputDir) {

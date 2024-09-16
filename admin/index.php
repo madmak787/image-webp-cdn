@@ -10,12 +10,12 @@ if(isset($_POST['signin'])) {
       //notice('Login successfully.');
       header("Location: dashboard.php");
     } else{
-      notice('Wrong password.');
+      // notice('Wrong password.');
       header("Location: index.php?wrong=password");
     }
   } else {
 		echo 'Wrong username.';
-		notice('Wrong username.');
+		// notice('Wrong username.');
 		header("Location: index.php?wrong=username");
 	}
   exit;
@@ -134,4 +134,3 @@ if(isset($_POST['signin'])) {
 </body>
 
 </html>
-<?php show_notice();?>
