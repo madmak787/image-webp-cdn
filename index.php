@@ -6,10 +6,11 @@ require 'htaccess.php';
 // echo "<pre>".print_r($_SERVER,true)."</pre>"; exit;
 
 if(isset($_FILES['file']) && $_FILES['file']['error']==0) {
-    $imagePath = $_FILES['file']['tmp_name'];
+    $imagePath = $_FILES['file'];
     $outputDir = './uploads';
 
-    $mimeType = mime_content_type($imagePath);
+    // $mimeType = mime_content_type($imagePath['tmp_name']);
+    $mimeType = $imagePath['type'];
     if ($mimeType === false) {
         throw new Exception("Unable to determine MIME type");
     }

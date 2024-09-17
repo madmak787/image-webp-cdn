@@ -47,8 +47,10 @@ function customlog($message, $logFile = 'custom.log') {
     }
 }
 
-function convertToWebP($imagePath, $outputDir)
+function convertToWebP($image, $outputDir)
 {
+    customlog($image);
+    $imagePath = $image['tmp_name'];
     if (!$imagePath || !$outputDir) {
         throw new Exception('Invalid image path or output directory.');
     }
@@ -80,9 +82,9 @@ function convertToWebP($imagePath, $outputDir)
     }
 
     // Generate unique filename based on timestamp
-    $randomName = substr(str_shuffle(str_repeat(date('YmdHis', $timestamp).'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil(20 / 62))), 0, 20);
-    $fileExtension = pathinfo($imagePath, PATHINFO_EXTENSION);
-    $filename = $randomName . '.' . $fileExtension;
+    // $randomName = substr(str_shuffle(str_repeat(date('YmdHis', $timestamp).'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil(20 / 62))), 0, 20);
+    // $fileExtension = pathinfo($image['name'], PATHINFO_EXTENSION);
+    $filename = time() . '-' . $image['name'];
 
     // Full path for the uploaded file
     $filePath = $dayFolder . '/' . $filename;
